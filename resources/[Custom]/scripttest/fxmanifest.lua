@@ -6,21 +6,12 @@ client_scripts {
     "client.lua",
 
     -- RageUI
-    "src/RMenu.lua",
-    "src/menu/RageUI.lua",
-    "src/menu/Menu.lua",
-    "src/menu/MenuController.lua",
-
-    "src/components/*.lua",
-
-    "src/menu/elements/*.lua",
-
-    "src/menu/items/*.lua",
-
-    "src/menu/panels/*.lua",
-
-    "src/menu/panels/*.lua",
-    "src/menu/windows/*.lua",
+    'src/RageUI.lua',
+    'src/Menu.lua',
+    'src/MenuController.lua',
+    'src/components/*.lua',
+    'src/elements/*.lua',
+    'src/items/*.lua',
 }
 
 server_scripts {

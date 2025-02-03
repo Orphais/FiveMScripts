@@ -7,6 +7,8 @@ end
 RegisterCommand("mark", function(source, args, rawCommand)
     local ped = PlayerPedId()
     local pos = GetEntityCoords(ped)
+    
+    local hasVehicle = false
 
     Citizen.CreateThread(function ()
         while true do
@@ -20,13 +22,31 @@ RegisterCommand("mark", function(source, args, rawCommand)
                 if dist < 2 then
                     AddTextEntry("SPAWNCAR", "Appuyez sur ~INPUT_PICKUP~ pour faire spawn votre voiture.")
                     DisplayHelpTextThisFrame("SPAWNCAR", false)
+                    
                     if IsControlJustPressed(1, 38) then
-                        local hashModel = GetHashKey('buffalo2')
-                        RequestModel(hashModel)
-                        while not HasModelLoaded(hashModel) do Citizen.Wait(10) end
-                        local car = CreateVehicle(hashModel, posPed, 90, true, false)
-                        TaskWarpPedIntoVehicle(ped, car, -1)
-                        showNotification("Votre voiture a spawn.")
+                        if hasVehicle == false then
+                            local vehicleList = GetAllVehicleModels()
+                            local hashModel = GetHashKey(vehicleList[math.random(1, #vehicleList)])
+                            RequestModel(hashModel)
+                            while not HasModelLoaded(hashModel) do Citizen.Wait(10) end
+                            local car = CreateVehicle(hashModel, posPed, 90, true, false)
+                            TaskWarpPedIntoVehicle(ped, car, -1)
+                            showNotification("Votre voiture a spawn.")
+                            hasVehicle = true
+                        else
+                            hasVehicle = false
+                            local lastVehicle = GetVehiclePedIsIn(ped, false) 
+                            DeleteVehicle(lastVehicle)
+
+                            local vehicleList = GetAllVehicleModels()
+                            local hashModel = GetHashKey(vehicleList[math.random(1, #vehicleList)])
+                            RequestModel(hashModel)
+                            while not HasModelLoaded(hashModel) do Citizen.Wait(10) end
+                            local car = CreateVehicle(hashModel, posPed, 90, true, false)
+                            TaskWarpPedIntoVehicle(ped, car, -1)
+                            showNotification("Votre voiture a été modifié.")
+                            hasVehicle = true
+                        end
                     end
                 end
             else 

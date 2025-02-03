@@ -1,111 +1,83 @@
+---
+--- @author Dylan MALANDAIN, Kalyptus
+--- @version 1.0.0
+--- File created at [24/05/2021 00:00]
+---
 
----- event from server to show notification
-RegisterNetEvent("RageUI:Popup")
-AddEventHandler("RageUI:Popup", function(array)
-    RageUI.Popup(array)
-end)
+Visual = {};
 
----Popup
----@param array table
----@public
-function RageUI.Popup(array)
-    ClearPrints()
-    if (array.colors == nil) then
-        SetNotificationBackgroundColor(140)
-    else
-        SetNotificationBackgroundColor(array.colors)
-    end
-    SetNotificationTextEntry("STRING")
-    if (array.message == nil) then
-        error("Missing arguments, message")
-    else
-        AddTextComponentString(tostring(array.message))
-    end
-    DrawNotification(false, true)
-    if (array.sound ~= nil) then
-        if (array.sound.audio_name ~= nil) then
-            if (array.sound.audio_ref ~= nil) then
-                PlaySoundFrontend(-1, array.sound.audio_name, array.sound.audio_ref, true)
-            else
-                error("Missing arguments, audio_ref")
-            end
-        else
-            error("Missing arguments, audio_name")
-        end
+local function AddLongString(txt)
+    for i = 100, string.len(txt), 99 do
+        local sub = string.sub(txt, i, i + 99)
+        AddTextComponentSubstringPlayerName(sub)
     end
 end
 
-
----PopupChar
----@param array table
----@public
-function RageUI.PopupChar(array)
-    if (array.colors == nil) then
-        SetNotificationBackgroundColor(140)
-    else
-        SetNotificationBackgroundColor(array.colors)
+function Visual.Notification(args)
+    if (not args.dict) and (args.name )then
+        args.dict = args.name
     end
-    SetNotificationTextEntry("STRING")
-    if (array.message == nil) then
-        error("Missing arguments, message")
-    else
-        AddTextComponentString(tostring(array.message))
+    if not HasStreamedTextureDictLoaded(args.dict) then
+        RequestStreamedTextureDict(args.dict, false)
+        while not HasStreamedTextureDictLoaded(args.dict) do Wait(0) end
     end
-    if (array.request_stream_texture_dics ~= nil) then
-        RequestStreamedTextureDict(array.request_stream_texture_dics)
+    if (args.backId) then
+        ThefeedNextPostBackgroundColor(args.backId)
     end
-    if (array.picture ~= nil) then
-        if (array.iconTypes == 1) or (array.iconTypes == 2) or (array.iconTypes == 3) or (array.iconTypes == 7) or (array.iconTypes == 8) or (array.iconTypes == 9) then
-            SetNotificationMessage(tostring(array.picture), tostring(array.picture), true, array.iconTypes, array.sender, array.title)
-        else
-            SetNotificationMessage(tostring(array.picture), tostring(array.picture), true, 4, array.sender, array.title)
-        end
-    else
-        if (array.iconTypes == 1) or (array.iconTypes == 2) or (array.iconTypes == 3) or (array.iconTypes == 7) or (array.iconTypes == 8) or (array.iconTypes == 9) then
-            SetNotificationMessage('CHAR_ALL_PLAYERS_CONF', 'CHAR_ALL_PLAYERS_CONF', true, array.iconTypes, array.sender, array.title)
-        else
-            SetNotificationMessage('CHAR_ALL_PLAYERS_CONF', 'CHAR_ALL_PLAYERS_CONF', true, 4, array.sender, array.title)
+    BeginTextCommandThefeedPost("jamyfafi")
+    if (args.message) then
+        AddTextComponentSubstringPlayerName(args.message)
+        if string.len(args.message) > 99 then
+            AddLongString(args.message)
         end
     end
-    if (array.sound ~= nil) then
-        if (array.sound.audio_name ~= nil) then
-            if (array.sound.audio_ref ~= nil) then
-                PlaySoundFrontend(-1, array.sound.audio_name, array.sound.audio_ref, true)
-            else
-                error("Missing arguments, audio_ref")
-            end
-        else
-            error("Missing arguments, audio_name")
-        end
+    if (args.title) and (args.subtitle) and (args.name) then
+        EndTextCommandThefeedPostMessagetext(args.dict or "CHAR_DEFAULT", args.name or "CHAR_DEFAULT", true, args.icon or 0, args.title or "", args.subtitle or "")
+        SetStreamedTextureDictAsNoLongerNeeded(args.dict)
     end
-    DrawNotification(false, true)
+    EndTextCommandThefeedPostTicker(false, true)
 end
 
----Text
----@param array table
----@public
-function RageUI.Text(array)
+function Visual.Subtitle(text, time)
     ClearPrints()
-    SetTextEntry_2("STRING")
-    if (array.message ~= nil) then
-        AddTextComponentString(tostring(array.message))
-    else
-        error("Missing arguments, message")
+    BeginTextCommandPrint("STRING")
+    AddTextComponentSubstringPlayerName(text)
+    EndTextCommandPrint(time and math.ceil(time) or 0, true)
+end
+
+function Visual.FloatingHelpText(text, sound, loop)
+    BeginTextCommandDisplayHelp("jamyfafi")
+    AddTextComponentSubstringPlayerName(text)
+    if string.len(text) > 99 then
+        AddLongString(text)
     end
-    if (array.time_display ~= nil) then
-        DrawSubtitleTimed(tonumber(array.time_display), 1)
-    else
-        DrawSubtitleTimed(6000, 1)
-    end
-    if (array.sound ~= nil) then
-        if (array.sound.audio_name ~= nil) then
-            if (array.sound.audio_ref ~= nil) then
-                PlaySoundFrontend(-1, array.sound.audio_name, array.sound.audio_ref, true)
-            else
-                error("Missing arguments, audio_ref")
-            end
-        else
-            error("Missing arguments, audio_name")
+    EndTextCommandDisplayHelp(0, loop or 0, sound or false, -1)
+end
+
+function Visual.Prompt(text, spinner)
+    BeginTextCommandBusyspinnerOn("STRING")
+    AddTextComponentSubstringPlayerName(text)
+    EndTextCommandBusyspinnerOn(spinner or 1)
+end
+
+function Visual.PromptDuration(duration, text, spinner)
+    Citizen.CreateThread(function()
+        Citizen.Wait(0)
+        Visual.Prompt(text, spinner)
+        Citizen.Wait(duration)
+        if (BusyspinnerIsOn()) then
+            BusyspinnerOff();
         end
+    end)
+end
+
+function Visual.FloatingHelpTextToEntity(text, x, y)
+    SetFloatingHelpTextScreenPosition(1, x, y)
+    SetFloatingHelpTextStyle(1, 1, 2, -1, 3, 0)
+    BeginTextCommandDisplayHelp("jamyfafi")
+    AddTextComponentSubstringPlayerName(text)
+    if string.len(text) > 99 then
+        AddLongString(text)
     end
+    EndTextCommandDisplayHelp(2, false, false, -1)
 end
