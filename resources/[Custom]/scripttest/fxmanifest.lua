@@ -3,7 +3,7 @@ games { 'gta5' };
 lua54 'yes'
 
 client_scripts {
-    "client.lua",
+    "client/*.lua",
 
     -- RageUI
     'src/RageUI.lua',
@@ -15,5 +15,5 @@ client_scripts {
 }
 
 server_scripts {
-    "server.lua"
+    "server/*.lua"
 }
