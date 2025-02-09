@@ -4,7 +4,7 @@ function showNotification(msg)
     DrawNotification(false, true)
 end
 
-RegisterCommand("car", function(source, args, rawCommand)
+RegisterCommand("carmark", function(source, args, rawCommand)
     local ped = PlayerPedId()
     local pos = GetEntityCoords(ped)
     
