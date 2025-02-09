@@ -4,7 +4,7 @@ function showNotification(msg)
     DrawNotification(false, true)
 end
 
-RegisterCommand("mark", function(source, args, rawCommand)
+RegisterCommand("car", function(source, args, rawCommand)
     local ped = PlayerPedId()
     local pos = GetEntityCoords(ped)
     
@@ -16,13 +16,16 @@ RegisterCommand("mark", function(source, args, rawCommand)
             local posPed = GetEntityCoords(ped)
             local dist = GetDistanceBetweenCoords(posPed, pos, true)
             
+            -- Etre à une distance < 10 pour voir le marqueur
             if dist < 10 then
                 interval = 1
                 DrawMarker(36, pos.x, pos.y, pos.z, 0, 0, 0, 0, 0, 0, 0.5, 0.5, 0.5, 255, 0, 0, 170, 0, 1, 2, 0, nil, nil, 0)   
+                -- Etre à une distance < 2 pour interagir avec le marqueur
                 if dist < 2 then
                     AddTextEntry("SPAWNCAR", "Appuyez sur ~INPUT_PICKUP~ pour faire spawn votre voiture.")
                     DisplayHelpTextThisFrame("SPAWNCAR", false)
                     
+                    -- Spawn
                     if IsControlJustPressed(1, 38) then
                         if hasVehicle then
                             hasVehicle = false
