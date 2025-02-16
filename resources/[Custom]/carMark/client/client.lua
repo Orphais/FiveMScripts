@@ -4,6 +4,22 @@ function showNotification(msg)
     DrawNotification(false, true)
 end
 
+-- Menu
+RMenu.Add('showcase', 'main', RageUI.CreateMenu("VEHICLE MENU", "Undefined for using SetSubtitle"))
+RMenu:Get('showcase', 'main'):SetSubtitle("~b~CHOOSE YOUR CAR")
+RMenu:Get('showcase', 'main').EnableMouse = false
+RMenu:Get('showcase', 'main').Closed = function()
+    -- TODO Perform action 
+end;
+
+local cars = GetAllVehicleModels()
+
+RegisterCommand('delete-basic-rmenu', function()
+    RMenu:Delete('showcase', 'main')
+end, false)
+
+
+--Mark
 RegisterCommand("carmark", function(source, args, rawCommand)
     local ped = PlayerPedId()
     local pos = GetEntityCoords(ped)
@@ -27,22 +43,49 @@ RegisterCommand("carmark", function(source, args, rawCommand)
                     
                     -- Spawn
                     if IsControlJustPressed(1, 38) then
-                        if hasVehicle then
-                            hasVehicle = false
-                            local lastVehicle = GetVehiclePedIsIn(ped, false) 
-                            DeleteVehicle(lastVehicle)
-                        end   
-
-                        local vehicleList = GetAllVehicleModels()
-                        local hashModel = GetHashKey(vehicleList[math.random(1, #vehicleList)])
-
-                        RequestModel(hashModel)
-                        while not HasModelLoaded(hashModel) do Citizen.Wait(10) end
-                        
-                        local car = CreateVehicle(hashModel, posPed, 90, true, false)
-                        TaskWarpPedIntoVehicle(ped, car, -1)
-                        showNotification("Votre voiture a spawn.")
-                        hasVehicle = true
+                        RageUI.Visible(RMenu:Get('showcase', 'main'), not RageUI.Visible(RMenu:Get('showcase', 'main')))
+                    end
+                
+                    if RageUI.Visible(RMenu:Get('showcase', 'main')) then
+                        RageUI.DrawContent({ header = true, glare = true, instructionalButton = true }, function()
+                            ---Items            
+                            for i = 1, #cars do
+                                local carname = GetDisplayNameFromVehicleModel(cars[i]) 
+                                RageUI.Button(carname, "Faire apparaître un ".. carname, { }, true, function(Hovered, Active, Selected)
+                                    if (Hovered) then
+                    
+                                    end
+                                    if (Active) then
+                    
+                                    end
+                                    if (Selected) then
+                                        -- spawn car + tp
+                
+                                        local ped = PlayerPedId()
+                                        local posPed = GetEntityCoords(ped)
+                
+                                        
+                                        if IsPedInAnyVehicle(ped, true) then
+                                            DeleteVehicle(GetVehiclePedIsIn(ped, false))
+                                        end
+                                        local hashModel = GetHashKey(cars[i])
+                                        RequestModel(hashModel)
+                                        while not HasModelLoaded(hashModel) do Citizen.Wait(10) end
+                                        
+                                        local car = CreateVehicle(hashModel, posPed, 90, true, false)
+                                        TaskWarpPedIntoVehicle(ped, car, -1)
+                
+                                        local string = "Your ".. carname.." spawned"
+                                        RageUI.Text({
+                                            message = string;
+                                        })
+                                    end
+                                end)   
+                            end
+                
+                        end, function()
+                            ---Panels
+                        end)
                     end
                 end
             else 
