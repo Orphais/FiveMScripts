@@ -45,48 +45,6 @@ RegisterCommand("carmark", function(source, args, rawCommand)
                     if IsControlJustPressed(1, 38) then
                         RageUI.Visible(RMenu:Get('showcase', 'main'), not RageUI.Visible(RMenu:Get('showcase', 'main')))
                     end
-                
-                    if RageUI.Visible(RMenu:Get('showcase', 'main')) then
-                        RageUI.DrawContent({ header = true, glare = true, instructionalButton = true }, function()
-                            ---Items            
-                            for i = 1, #cars do
-                                local carname = GetDisplayNameFromVehicleModel(cars[i]) 
-                                RageUI.Button(carname, "Faire apparaître un ".. carname, { }, true, function(Hovered, Active, Selected)
-                                    if (Hovered) then
-                    
-                                    end
-                                    if (Active) then
-                    
-                                    end
-                                    if (Selected) then
-                                        -- spawn car + tp
-                
-                                        local ped = PlayerPedId()
-                                        local posPed = GetEntityCoords(ped)
-                
-                                        
-                                        if IsPedInAnyVehicle(ped, true) then
-                                            DeleteVehicle(GetVehiclePedIsIn(ped, false))
-                                        end
-                                        local hashModel = GetHashKey(cars[i])
-                                        RequestModel(hashModel)
-                                        while not HasModelLoaded(hashModel) do Citizen.Wait(10) end
-                                        
-                                        local car = CreateVehicle(hashModel, posPed, 90, true, false)
-                                        TaskWarpPedIntoVehicle(ped, car, -1)
-                
-                                        local string = "Your ".. carname.." spawned"
-                                        RageUI.Text({
-                                            message = string;
-                                        })
-                                    end
-                                end)   
-                            end
-                
-                        end, function()
-                            ---Panels
-                        end)
-                    end
                 end
             else 
                 interval = 200
@@ -96,3 +54,51 @@ RegisterCommand("carmark", function(source, args, rawCommand)
     end)
     showNotification("Mark")
 end, false)
+
+CreateThread(function()
+    while true do 
+    Citizen.Wait(0)
+    if RageUI.Visible(RMenu:Get('showcase', 'main')) then
+        RageUI.DrawContent({ header = true, glare = true, instructionalButton = true }, function()
+            ---Items            
+            for i = 1, #cars do
+                local carname = GetDisplayNameFromVehicleModel(cars[i]) 
+                RageUI.Button(carname, "Faire apparaître un ".. carname, {RightBadge = RageUI.BadgeStyle.Car }, true, function(Hovered, Active, Selected)
+                    if (Hovered) then
+    
+                    end
+                    if (Active) then
+    
+                    end
+                    if (Selected) then
+                        -- spawn car + tp
+
+                        local ped = PlayerPedId()
+                        local posPed = GetEntityCoords(ped)
+
+                        
+                        if IsPedInAnyVehicle(ped, true) then
+                            DeleteVehicle(GetVehiclePedIsIn(ped, false))
+                        end
+                        local hashModel = GetHashKey(cars[i])
+                        RequestModel(hashModel)
+                        while not HasModelLoaded(hashModel) do Citizen.Wait(10) end
+                        
+                        local car = CreateVehicle(hashModel, posPed, 90, true, false)
+                        TaskWarpPedIntoVehicle(ped, car, -1)
+
+                        local string = "Your ".. carname.." spawned"
+                        RageUI.Text({
+                            message = string;
+                        })
+                        RageUI.CloseAll()
+                    end
+                end)   
+            end
+
+        end, function()
+            ---Panels
+        end)
+    end
+    end
+end)
