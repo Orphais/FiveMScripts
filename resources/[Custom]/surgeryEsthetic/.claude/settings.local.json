@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir \"C:\\\\FiveMServer\\\\server-data\\\\resources\\\\[Custom]\\\\qb-core\\\\client\")",
+      "Bash(dir \"C:\\\\FiveMServer\\\\server-data\\\\resources\\\\[Custom]\\\\qb-core\\\\server\")",
+      "Bash(dir \"C:\\\\FiveMServer\\\\server-data\\\\resources\\\\[Custom]\\\\qb-core\\\\shared\")",
+      "Bash(dir:*)",
+      "Bash(cd:*)",
+      "Bash(tree:*)",
+      "Bash(find:*)",
+      "Bash(curl:*)",
+      "Bash(lua:*)"
+    ]
+  }
+}
